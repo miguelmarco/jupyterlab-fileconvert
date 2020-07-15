@@ -6,11 +6,13 @@ Menu to convert files to other formats
 ## Prerequisites
 
 * JupyterLab
+* To have a `sws2ipynb` program in the path, that performs the sws to ipynb conversion.
 
 ## Installation
 
 ```bash
 jupyter labextension install fileconvert
+pip3 install .
 ```
 
 ## Development
