@@ -66,11 +66,12 @@ class ConvertHandler(APIHandler):
     @gen.coroutine
     def post(self, *args, **kwargs):
         args = json.loads(self.request.body.decode('utf-8'))
+        print(args)
         if args["format"] == 'ipynb':
             out = yield self.run_command([['sws2ipynb', homedir+args["path"] ]])
         else:
             out = yield self.run_command([['jupyter', 'nbconvert', '--to', args["format"], homedir+args["path"] ]])
-        self.finish(json.dumps(args["path"] + " converted."))
+        self.finish(json.dumps(args["path"] + " converted to {}.".format(args["format"])))
 
 
 
