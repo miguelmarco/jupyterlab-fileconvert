@@ -34,40 +34,60 @@ const extension: JupyterFrontEndPlugin<void> = {
         label: '.ipynb',
         caption: 'Convert file to ipynb format',
         execute: () => {
-//             const file = factory.tracker.currentWidget.selectedItems().next();
+            return showDialog({
+                title: 'Convert file',
+                body: 'Convert file?',
+                buttons: [
+                    Dialog.cancelButton(),
+                    Dialog.okButton()
+                ]
+            }).then(result => {
+                    if (result.button.accept)
 
-            let leftSidebarItems = app.shell.widgets('left');
-            let fileBrowser = leftSidebarItems.next();
-            let selecteditems = (fileBrowser as any).selectedItems();
-            let filepath = selecteditems.next().path;
-            console.log("En ConvertForm: ");
-            console.log("baseurl: ", URLExt.join(ServerConnection.makeSettings().baseUrl));
-            let fullUrl = URLExt.join(ServerConnection.makeSettings().baseUrl, 'convert');
-            let fullRequest = {
-              method: 'POST',
-              body: JSON.stringify({path: filepath, format: 'ipynb'})
-              };
-            var resul = ServerConnection.makeRequest(fullUrl, fullRequest, ServerConnection.makeSettings()).then(response => {
-                if (response.status !== 200) {
-                    return response.text().then(data => {
-                        throw new ServerConnection.ResponseError(response, data);
+                        {
+        //             const file = factory.tracker.currentWidget.selectedItems().next();
+
+                        let leftSidebarItems = app.shell.widgets('left');
+                        let fileBrowser = leftSidebarItems.next();
+                        let selecteditems = (fileBrowser as any).selectedItems();
+                        let filepath = selecteditems.next().path;
+                        console.log("En ConvertForm: ");
+                        console.log("baseurl: ", URLExt.join(ServerConnection.makeSettings().baseUrl));
+                        let fullUrl = URLExt.join(ServerConnection.makeSettings().baseUrl, 'convert');
+                        let fullRequest = {
+                        method: 'POST',
+                        body: JSON.stringify({path: filepath, format: 'ipynb'})
+                        };
+                        var resul = ServerConnection.makeRequest(fullUrl, fullRequest, ServerConnection.makeSettings()).then(response => {
+                            if (response.status !== 200) {
+                                return response.text().then(data => {
+                                    throw new ServerConnection.ResponseError(response, data);
+                                    });
+                            }
+                            return response.text();
+                            });
+                        resul.then(response => {
+                            console.log("respose: ", response)
+                            showDialog({
+                                title: 'Convert file',
+                                body: response,
+                                buttons: [
+                                Dialog.okButton({label : "OK"})
+                                ]
+                            });
+                        }).then(response => {
+                            console.log(app.shell.widgets('left').next());
+                            let fBrowser = app.shell.widgets('left').next();
+                            (fBrowser as any).model.refresh();
                         });
-                  }
-                return response.text();
-                });
-            resul.then(response => {
-                console.log("respose: ", response)
-                showDialog({
-                    title: 'Convert file',
-                    body: response,
-                    buttons: [
-                    Dialog.okButton({label : "OK"})
-                    ]
-                });
-            });
-            return ;
-        },
-    });
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                })
+        }
+    })
 
 
     const { commands } = app;
